@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { generateBlock } from './block.ts';
+import { generateBlock, generateLot } from './block.ts';
 import { ellipseSegs, generateBuilding, outline } from './building.ts';
 import { layoutCity } from './city.ts';
 import { generateLandmark, LANDMARKS } from './landmarks.ts';
@@ -102,4 +102,13 @@ test('zoned city places a civic hall and churches', () => {
   const city = layoutCity({ size: 900, seed: 3, blockMin: 55, blockMax: 120, parks: 0.1, density: 1, district: 'auto' });
   const kinds = city.blocks.map((b) => b.landmark).filter(Boolean);
   assert.ok(kinds.includes('civic') && kinds.includes('church'), kinds.join());
+});
+
+test('a lot dropped onto terrain is built at its ground height', () => {
+  const b = new Builder();
+  generateLot(b, { x: 0, z: 0, w: 14, d: 24, angle: 0.7, style: 'suburban', seed: 9, floors: 0, y: 12.5 }, { detail: 1 });
+  let lo = Infinity;
+  for (let i = 1; i < b.solid.pos.length; i += 3) lo = Math.min(lo, b.solid.pos[i]);
+  assert.ok(b.solid.vertexCount > 0);
+  assert.ok(lo >= 12.5 - 1e-6, `lowest vertex ${lo}`);
 });

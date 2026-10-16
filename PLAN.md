@@ -5,6 +5,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm test           # engine checks (node --test)
 npm run typecheck
+npm run build:lib  # lib/citygen.js — the engine as one plain ES module, for games
 ```
 
 Shortcuts: `R` new seed · `N` day/night · `1/2/3` modes.
@@ -33,6 +34,7 @@ src/engine/   (three-free, deterministic, reusable by the driving game)
   building.ts  footprint cells → tiers/setbacks → facades (bays × floors → modules) → roof → props
   block.ts     block → perimeter lots → buildings, sidewalks, courtyards, trees, lamps
   city.ts      recursive road subdivision → zoning → blocks; exports road graph
+  index.ts     public API, bundled to lib/citygen.js (no three.js, no DOM — runs in a worker)
 src/viewer.ts  three.js scene, lights, day/night, grow animations, GLB export
 src/main.ts    UI (mode tabs, generated control panels)
 ```
@@ -46,4 +48,5 @@ Determinism: same `(style, seed, params)` → identical geometry. City layout JS
 1. ✅ Engine core: rng, builder, styles, building pipeline.
 2. ✅ Block + city generation, road graph export.
 3. ✅ Web UI: three modes, day/night, GLB + JSON export.
-4. Next: Web Worker generation + chunk streaming for the game, tensor-field roads, terrain, non-orthogonal blocks, texture atlas option.
+4. ✅ Game bundle: `lib/citygen.js` (committed, rebuild with `npm run build:lib`). `generateLot` takes a lot's ground height `y`, so a game can drop lots onto terrain. Used by [HighRoads](https://github.com/YigitSalihEmecen/HighRoads) for roadside villages and distant cities, generated in a Web Worker.
+5. Next: chunk streaming + chunk streaming for the game, tensor-field roads, terrain, non-orthogonal blocks, texture atlas option.

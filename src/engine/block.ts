@@ -2,7 +2,7 @@ import { generateBuilding, type Corner } from './building.ts';
 import { generateLandmark } from './landmarks.ts';
 import { Builder, color, shade, type RGB } from './mesh.ts';
 import { hash, rng, type Rng } from './rng.ts';
-import { DISTRICTS, STYLE, type Style } from './styles.ts';
+import { DISTRICTS, STYLE } from './styles.ts';
 
 export interface BlockParams {
   width: number;
@@ -26,6 +26,8 @@ export interface Lot {
   seed: number;
   floors: number;
   corner?: 'left' | 'right' | 'both';
+  /** ground height under the lot; blocks are flat (0), a game drops lots onto terrain */
+  y?: number;
 }
 
 export const CURB = 0.15;
@@ -86,12 +88,15 @@ export function generateBlock(b: Builder, p: BlockParams, ox = 0, oz = 0): Lot[]
     } else if (sideLen > 4) courtyard(b, r, Wi, sideLen, ox, oz, p.detail);
   }
 
-  for (const lot of lots) lotBuilding(b, lot, STYLE[lot.style], p, ox, oz);
+  for (const lot of lots) generateLot(b, lot, p, ox, oz);
   return lots;
 }
 
-function lotBuilding(b: Builder, lot: Lot, st: Style, p: BlockParams, ox: number, oz: number) {
+/** One lot's building, yard and garden trees. The lot's front (+z after `angle`) faces the street. */
+export function generateLot(b: Builder, lot: Lot, p: Pick<BlockParams, 'detail' | 'heightScale'>, ox = 0, oz = 0) {
+  const st = STYLE[lot.style];
   const r = rng(lot.seed);
+  const y = lot.y ?? 0;
   const c = Math.cos(lot.angle), s = Math.sin(lot.angle);
   const toWorld = (lx: number, lz: number): [number, number] => [ox + lot.x + lx * c + lz * s, oz + lot.z - lx * s + lz * c];
   const side = st.lot.side;
@@ -100,7 +105,7 @@ function lotBuilding(b: Builder, lot: Lot, st: Style, p: BlockParams, ox: number
   const bd = Math.min(lot.d - front - (st.attached ? 0 : 3), r.range(...st.lot.depth));
   if (bw < 4 || bd < 4) return;
   if (!st.attached) {
-    b.setFrame(...toWorld(0, 0), lot.angle, CURB + 0.03);
+    b.setFrame(...toWorld(0, 0), lot.angle, y + CURB + 0.03);
     b.face(b.solid, [[-lot.w / 2 + 0.4, 0, -lot.d / 2 + 0.4], [lot.w / 2 - 0.4, 0, -lot.d / 2 + 0.4], [lot.w / 2 - 0.4, 0, lot.d / 2 - 0.4], [-lot.w / 2 + 0.4, 0, lot.d / 2 - 0.4]], r.pick(GRASS), [0, 1, 0]);
     if (p.detail >= 1 && st.id === 'suburban') {
       for (let k = 0; k < r.int(1, 3); k++) {
@@ -109,7 +114,7 @@ function lotBuilding(b: Builder, lot: Lot, st: Style, p: BlockParams, ox: number
       }
     }
   }
-  b.setFrame(...toWorld(0, lot.d / 2 - front - bd / 2), lot.angle, CURB);
+  b.setFrame(...toWorld(0, lot.d / 2 - front - bd / 2), lot.angle, y + CURB);
   const corner: Corner = lot.corner ? (r.chance(0.6) ? lot.corner : 'none') : st.attached ? 'none' : 'auto';
   const info = generateBuilding(b, { style: st, seed: lot.seed, width: bw, depth: bd, detail: p.detail, heightScale: p.heightScale, corner, open: lot.corner });
   lot.floors = info.floors;
