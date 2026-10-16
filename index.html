@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Plinth — Procedural Architecture</title>
+    <meta name="description" content="Procedural building, block and city generator." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23D97757'/%3E%3Cpath d='M9 24V13l7-5 7 5v11' fill='none' stroke='%23FAF9F5' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="viewport"></div>
+    <div class="progress" aria-hidden="true"><i></i></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" /><path d="M9 24V13l7-5 7 5v11M13 24v-5h6v5" /></svg>
+        <span class="word">Plinth</span>
+        <span class="tag">procedural architecture</span>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Generator mode">
+        <span class="thumb" aria-hidden="true"></span>
+        <button role="tab" data-mode="building">Building</button>
+        <button role="tab" data-mode="block">Block</button>
+        <button role="tab" data-mode="city">City</button>
+      </nav>
+      <div class="actions">
+        <button class="icon" id="night" aria-label="Toggle night" title="Day / night (N)">
+          <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" /></svg>
+          <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
+        </button>
+        <div class="menu">
+          <button class="btn ghost" id="export" aria-haspopup="true" aria-expanded="false">
+            Export
+            <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+          </button>
+          <div class="menu-list" role="menu">
+            <button role="menuitem" data-export="glb"><b>GLB model</b><span>Merged meshes, vertex colours</span></button>
+            <button role="menuitem" data-export="json"><b>Layout JSON</b><span>Seeds, lots and road graph</span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="panel" aria-label="Generator settings">
+      <button class="handle" aria-label="Toggle panel"><i></i></button>
+      <div class="panel-head">
+        <h1 id="title">Building</h1>
+        <p id="subtitle"></p>
+      </div>
+      <div class="controls" id="controls"></div>
+      <div class="panel-foot">
+        <button class="btn primary" id="shuffle">
+          <svg class="dice" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" /><circle cx="8.5" cy="8.5" r="1.2" /><circle cx="15.5" cy="15.5" r="1.2" /><circle cx="15.5" cy="8.5" r="1.2" /><circle cx="8.5" cy="15.5" r="1.2" /><circle cx="12" cy="12" r="1.2" /></svg>
+          New seed
+          <kbd>R</kbd>
+        </button>
+      </div>
+    </aside>
+
+    <div class="info" id="info" aria-live="polite"></div>
+    <footer class="stats" id="stats"></footer>
+    <div class="toast" id="toast" role="status"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
